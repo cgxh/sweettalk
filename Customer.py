@@ -1,7 +1,7 @@
 from Account import User
 class Customer(User):
     count_id=0
-    def __init__(self,username,password,first_name, last_name, mobile_no,address):
+    def __init__(self,first_name, last_name, mobile_no,address,username,password,):
         super().__init__(username,password)
         Customer.count_id+=1
         self.__customer_id=Customer.count_id

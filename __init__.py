@@ -1,31 +1,63 @@
 from flask import Flask,render_template,request, redirect, url_for
 from Forms import *
-import shelve,Customer
+import shelve,Customer,Account
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
     login_customer_form = LoginCustomerForm(request.form)
     if request.method == 'POST' and login_customer_form.validate():
-        customers_dict = {}
-        db = shelve.open('customer.db', 'c')
-        if key in shelve.open('customer.db', 'c')==username
-        try:
+        # db = shelve.open('customer.db', 'c')
+        # for i in db:
+        #     if db[i].get('username')==login_customer_form.username.data:
+        #         if db[i].get("password")==login_customer_form.password.data:
+        #             return redirect(url_for("welcome"))
+        #             end
+            customers_dict = {}
+            db = shelve.open('customer.db', 'r')
             customers_dict = db['Customers']
-        except:
-            print("Error in retrieving Customers from customer.db.")
+            db.close()
+            # global user
+            # user= request.form.get('username')
+            if login_customer_form.username.data=="A":
+                return redirect(url_for("welcome"))
+            # customers_list = []
+            # for key in customers_dict:
+            #     customer = customers_dict.get(key)
+            #     customers_list.append(customer)
+            #     db.close()
+            # for customer in customers_list:
+            #     if customer.get_username()==request.form.get('username'):
+            #         if customer.get_username()==request.form.get('password'):
+            #             return redirect(url_for("welcome"))
+            #             end
+            return redirect(url_for("home"))
 
-        customer = Customer.Customer(
-                                     create_customer_form.username.data, create_customer_form.password.data
-                                    )
 
-        customers_dict[customer.get_customer_id()] = customer
-        db['Customers'] = customers_dict
+        # UP_dict = {}
+        # UP = shelve.open('up.db', 'c')
+        # try:
+        #     UP_dict = UP['userpass']
+        # except:
+        #     print("Error")
+        #
+        # UP = [login_customer_form.username.data,login_customer_form.password.data]
+        # UP_dict[0]=UP
+        # UP['userpass']=UP_dict
+        # personal=shelve.open(shelve.open('uplist.db', 'c'))
+        #
+        # for i in personal:
+        #     if personal[i]==UP['up']:
+        #         return redirect(url_for("welcome"))
+        #         end
+        # UP.close()
+        # personal.close
 
-        db.close()
-        return redirect(url_for("home"))
-    return render_template('createCustomer.html', form=create_customer_form)
-    return render_template('homelogin.html')
+    return render_template('loginCustomer.html', form=login_customer_form)
+    # return render_template('homelogin.html')
+@app.route('/welcome')
+def welcome():
+    return render_template('welcome.html')
 
 @app.route('/createCustomer', methods=['GET', 'POST'])
 def create_customer():
@@ -48,6 +80,21 @@ def create_customer():
         db['Customers'] = customers_dict
 
         db.close()
+        # upmanage_dict={}
+        # personal = shelve.open('uplist.db', 'c')
+        #
+        # try:
+        #     upmanage_dict = personal['up']
+        # except:
+        #     print("Error")
+        #
+        # up = create_customer_form.username.data, create_customer_form.password.data
+        #
+        # upmanage_dict[customer.get_customer_id()] = up
+        # up['up'] = upmanage_dict
+        #
+        # up.close()
+
         return redirect(url_for("home"))
     return render_template('createCustomer.html', form=create_customer_form)
 
@@ -56,8 +103,17 @@ def customer_profile():
     customers_dict = {}
     db = shelve.open('customer.db', 'r')
     customers_dict = db['Customers']
-    db.get("Customers")
     db.close()
+
+    customers_list = []
+    for key in customers_dict:
+        customer = customers_dict.get(key)
+        customers_list.append(customer)
+        db.close()
+    for key in customers_list:
+        if customer.get_username()==user:
+            pass
+
     return render_template('CustomerProfile.html')
 
 #
