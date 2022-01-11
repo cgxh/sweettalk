@@ -406,6 +406,11 @@ def delete_cart(id):
 
     return redirect(url_for('retrieve_cart'))
 
+@app.route('/purchase')
+def purchase():
+    return render_template('purchase.html')
+
+
 @app.route('/order', methods=['GET', 'POST'])
 def create_order():
     create_order_form = CreateOrderForm(request.form)
@@ -439,7 +444,7 @@ def create_order():
 
         db.close()
 
-        return redirect(url_for('home'))
+        return redirect(url_for('purchase'))
 
     return render_template('order.html', form=create_order_form)
 
