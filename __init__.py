@@ -19,8 +19,16 @@ def home():
             db.close()
             # global user
             # user= request.form.get('username')
-            if login_customer_form.username.data=="A":
-                return redirect(url_for("welcome"))
+            customers_list = []
+            for key in customers_dict:
+                customer = customers_dict.get(key)
+                customers_list.append(customer)
+                db.close()
+            for customer in customers_list:
+                if customer.get_username()== login_customer_form.username.data:
+                    if customer.get_password()== login_customer_form.password.data:
+                        return redirect(url_for("welcome"))
+            username=login_customer_form.username.data
             # customers_list = []
             # for key in customers_dict:
             #     customer = customers_dict.get(key)
@@ -32,7 +40,6 @@ def home():
             #             return redirect(url_for("welcome"))
             #             end
             return redirect(url_for("home"))
-
 
         # UP_dict = {}
         # UP = shelve.open('up.db', 'c')
@@ -110,11 +117,10 @@ def customer_profile():
         customer = customers_dict.get(key)
         customers_list.append(customer)
         db.close()
-    for key in customers_list:
-        if customer.get_username()==user:
-            pass
-
-    return render_template('CustomerProfile.html')
+    for customer in customers_list:
+        if customer.get_username()==username:
+            return customer
+            return render_template('CustomerProfile.html')
 
 #
 # @app.route('/contactUs')
