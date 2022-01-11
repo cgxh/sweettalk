@@ -1,6 +1,6 @@
 from flask import Flask,render_template,request, redirect, url_for
 from Forms import *
-import shelve,Customer,Account
+import shelve,Customer,Account, Cart, Order
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
@@ -308,6 +308,141 @@ def delete_customer(id):
     db.close()
 
     return redirect(url_for('retrieve_customers'))
+
+@app.route('/createCart', methods=['GET', 'POST'])
+def create_cart():
+    create_user_form = CreateCartForm(request.form)
+    if request.method == 'POST' and create_user_form.validate():
+        db = shelve.open('cart.db', 'c')  # creates db if not present
+        users_dict = {}
+        try:
+            if 'Users' in db:             #setup users_dict in db
+                users_dict = db['Users']
+            else:
+                db['Users'] = users_dict
+
+            if 'User_Countid' in db:      # setup User.count_id in db
+                Cart.count_id = db['User_Countid']
+            else:
+                db['User_Countid'] = 0
+
+        except:
+            print("Error in retrieving Users from cart.db.")
+        print(f'create_user: open db["Users"] len = {len(users_dict)} user_id = {Cart.count_id}')
+
+        user = Cart.Cart(create_user_form.product_name.data, create_user_form.last_name.data,
+                         create_user_form.quantity.data, create_user_form.sugar_lvl.data)
+        users_dict[user.get_user_id()] = user
+        db['Users'] = users_dict
+        db['User_Countid'] = Cart.count_id
+
+        # Test codes
+        #users_dict = db['Users']
+        #user = users_dict[user.get_user_id()]
+        #print(user.get_first_name(), user.get_last_name(), "was stored in cart.db successfully with user_id ==",
+              #user.get_user_id())
+
+        db.close()
+
+        return redirect(url_for('retrieve_cart'))
+
+    return render_template('createCart.html', form=create_user_form)
+
+@app.route('/retrieveCart')
+def retrieve_cart():
+    users_dict = {}
+    db = shelve.open('cart.db', 'r')
+    users_dict = db['Users']
+    db.close()
+
+    users_list = []
+    for key in users_dict:
+        user = users_dict.get(key)
+        users_list.append(user)
+
+    return render_template('retrieveCart.html', count=len(users_list), users_list=users_list)
+
+@app.route('/updateCart/<int:id>/', methods=['GET', 'POST'])
+def update_cart(id):
+    update_user_form = CreateCartForm(request.form)
+    if request.method == 'POST' and update_user_form.validate():
+        users_dict = {}
+        db = shelve.open('cart.db', 'w')
+        users_dict = db['Users']
+
+        user = users_dict.get(id)
+        user.set_product_name(update_user_form.product_name.data)
+        user.set_last_name(update_user_form.last_name.data)
+        user.set_quantity(update_user_form.quantity.data)
+        user.set_sugar_lvl(update_user_form.sugar_lvl.data)
+
+        db['Users'] = users_dict
+        db.close()
+
+        return redirect(url_for('retrieve_cart'))
+    else:
+        users_dict = {}
+        db = shelve.open('cart.db', 'r')
+        users_dict = db['Users']
+        db.close()
+
+        user = users_dict.get(id)
+        update_user_form.product_name.data = user.get_product_name()
+        update_user_form.last_name.data = user.get_last_name()
+        update_user_form.quantity.data = user.get_quantity()
+        update_user_form.sugar_lvl.data = user.get_sugar_lvl()
+        return render_template('updateCart.html', form=update_user_form)
+
+@app.route('/deleteCart/<int:id>', methods=['POST'])
+def delete_cart(id):
+    users_dict = {}
+    db = shelve.open('cart.db', 'w')
+    users_dict = db['Users']
+
+    users_dict.pop(id)
+
+    db['Users'] = users_dict
+    db.close()
+
+    return redirect(url_for('retrieve_cart'))
+
+@app.route('/order', methods=['GET', 'POST'])
+def create_order():
+    create_order_form = CreateOrderForm(request.form)
+    if request.method == 'POST' and create_order_form.validate():
+        db = shelve.open('order.db', 'c')  # creates db if not present
+        orders_dict = {}
+        try:
+            if 'Orders' in db:             #setup users_dict in db
+                orders_dict = db['Orders']
+            else:
+                db['Orders'] = orders_dict
+
+            #if 'User_Countid' in db:  # setup User.count_id in db
+                #User.count_id = db['User_Countid']
+            #else:
+                #db['User_Countid'] = 0
+
+
+        except:
+            print("Error in retrieving Orders from order.db.")
+        #print(f'create_order: open db["Orders"] len = {len(orders_dict)} user_id = {User.count_id} ')
+
+        order = Order.Order(create_order_form.name.data, create_order_form.card_number.data,
+                         create_order_form.expiry_date.data, create_order_form.cvv.data, create_order_form.address.data)
+        db['Orders'] = orders_dict
+
+        # Test codes
+        #orders_dict = db['Orders']
+        #order = orders_dict[order.get_order_id()]
+        #print(order.get_name(), "was stored in user.db successfully with user_id ==")
+
+        db.close()
+
+        return redirect(url_for('home'))
+
+    return render_template('order.html', form=create_order_form)
+
 
 
 if __name__ == '__main__':
