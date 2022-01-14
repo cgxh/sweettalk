@@ -1,6 +1,6 @@
 from flask import Flask,render_template,request, redirect, url_for
 from Forms import *
-import shelve,Customer,Account, Cart, Order
+import shelve,Customer,Account,Staff, Cart, Order
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
@@ -87,26 +87,12 @@ def create_customer():
         db['Customers'] = customers_dict
 
         db.close()
-        # upmanage_dict={}
-        # personal = shelve.open('uplist.db', 'c')
-        #
-        # try:
-        #     upmanage_dict = personal['up']
-        # except:
-        #     print("Error")
-        #
-        # up = create_customer_form.username.data, create_customer_form.password.data
-        #
-        # upmanage_dict[customer.get_customer_id()] = up
-        # up['up'] = upmanage_dict
-        #
-        # up.close()
 
         return redirect(url_for("home"))
     return render_template('createCustomer.html', form=create_customer_form)
 
 @app.route('/CustomerProfile')
-def customer_profile():
+def retrieve_profile():
     customers_dict = {}
     db = shelve.open('customer.db', 'r')
     customers_dict = db['Customers']
@@ -118,7 +104,7 @@ def customer_profile():
         customers_list.append(customer)
         db.close()
     for customer in customers_list:
-        if customer.get_username()==username:
+        # if customer.get_username()==username:
             return customer
             return render_template('CustomerProfile.html')
 
@@ -200,7 +186,7 @@ def customer_profile():
 #
 #     return render_template('retrieveUsers.html', count=len(users_list), users_list=users_list)
 #
-@app.route('/retrieveCustomers')
+@app.route('/retrieveCustomers') #customer list
 def retrieve_customers():
     customers_dict = {}
     db = shelve.open('customer.db', 'r')
@@ -308,6 +294,49 @@ def delete_customer(id):
     db.close()
 
     return redirect(url_for('retrieve_customers'))
+
+@app.route('/loginStaff', methods=['GET', 'POST'])
+def staffLogin():
+    login_staff_form = LoginStaffForm(request.form)
+    if request.method == 'POST' and login_staff_form.validate():
+            staff_dict = {}
+            db = shelve.open('staff.db', 'r')
+            staff_dict = db['Staffs']
+            db.close()
+
+            staff_list = []
+            for key in staff_dict:
+                staff = staff_dict.get(key)
+                staff_list.append(staff)
+                db.close()
+            for staff in staff_list:
+                if staff.get_username()== login_staff_form.username.data:
+                    if staff.get_password()== login_staff_form.password.data:
+                        return redirect(url_for("backend"))
+
+    return render_template('loginStaff.html', form=login_staff_form)
+
+@app.route('/createStaff', methods=['GET', 'POST'])
+def create_staff():
+    create_staff_form = CreateStaffForm(request.form)
+    if request.method == 'POST' and create_staff_form.validate():
+        staff_dict = {}
+        db = shelve.open('staff.db', 'c')
+        try:
+            staff_dict = db['Staffs']
+        except:
+            print("Error in retrieving Customers from customer.db.")
+
+        staff = Staff.Staff(create_staff_form.staff_id.data,
+                            create_staff_form.username.data,
+                            create_staff_form.password.data)
+
+        staff_dict[staff.get_staff_count()] = staff
+        db['Staffs'] = staff_dict
+
+        db.close()
+        return redirect(url_for("backend"))
+    return render_template('createStaff.html', form=create_staff_form)
 
 @app.route('/createCart', methods=['GET', 'POST'])
 def create_cart():
@@ -448,6 +477,9 @@ def create_order():
 
     return render_template('order.html', form=create_order_form)
 
+@app.route('/backend')
+def backend():
+    return render_template('backend.html')
 
 
 if __name__ == '__main__':
