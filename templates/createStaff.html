@@ -1,12 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Customer Login{% endblock %}
+{% block title %}Staff Sign Up{% endblock %}
 
 {% block content %}
 {% from "includes/_formHelper.html" import render_field %}
 
-<h1 class="display-4">Log in</h1>
+<h1 class="display-4">Staff Sign Up</h1>
 
 <form method="POST" action="">
+
+  <div class="form-group">
+    {{ render_field(form.staff_id, class="form-control") }}
+  </div>
 
   <div class="form-group">
     {{ render_field(form.username, class="form-control") }}
@@ -17,8 +21,7 @@
 
   <input type="submit" value="Submit" class="btn btn-primary"/>
 </form>
-<a href="/createCustomer">No Account?Click Here To Sign Up</a>
+<a href="/loginStaff">Have Account?Click Here To Login</a>
 
 {% endblock %}
-
 

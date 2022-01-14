@@ -34,6 +34,18 @@ class LoginCustomerForm(Form):
       # password = hashlib.md5('Password')
       password= StringField('Password', [validators.Length(min=1, max=15), validators.DataRequired()])
 
+class LoginStaffForm(Form):
+
+      username = StringField('Username', [validators.Length(min=1, max=15), validators.DataRequired()])
+      # password = hashlib.md5('Password')
+      password= StringField('Password', [validators.Length(min=1, max=15), validators.DataRequired()])
+
+class CreateStaffForm(Form):
+      staff_id = StringField('Staff ID', [validators.Length(min=1, max=150), validators.DataRequired()])
+      username = StringField('Username', [validators.Length(min=1, max=15), validators.DataRequired()])
+      # password = hashlib.md5('Password')
+      password= StringField('Password', [validators.Length(min=1, max=15), validators.DataRequired()])
+
 class CreateCartForm(Form):     # CreateUserForm inherits from class form
     product_name = StringField('Product Name', [validators.Length(min=1, max=150), validators.DataRequired()])
     last_name = StringField('Last Name', [validators.Length(min=1, max=150), validators.Optional()])
